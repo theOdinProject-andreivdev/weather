@@ -5,7 +5,8 @@ const API_KEY = "04e0dee5fe194dcd20fb3d326d8e5a4d";
 
 function App() {
   const [theme, setTheme] = useState("");
-  const [validData, setValidData] = useState(false);
+  const [validData, setValidData] = useState(true);
+  const [loaded, setLoaded] = useState(false);
   const [placeholderCity, setPlaceholderCity] = useState("");
   const [tempCity, setTempCity] = useState("");
   const [city, setCity] = useState("");
@@ -65,10 +66,12 @@ function App() {
         })
         .then(function (response) {
           setValidData(true);
+          setLoaded(true);
           parseAndSetWeather(response);
         })
         .catch((error) => {
           setValidData(false);
+          setLoaded(false);
           console.error("Error:", error);
         });
     }
@@ -139,7 +142,7 @@ function App() {
 
         <div className="row">
           <div className="col">
-            {validData && (
+            {validData && loaded && (
               <div className={`card mb-3 ${theme}`}>
                 <img
                   src={weather.icon}
@@ -180,15 +183,22 @@ function App() {
               </div>
             )}
             {!validData && (
-              <div className="card mb-3">
+              <div className={`card mb-3 ${theme}`}>
                 <div className="card-body">
                   <h5 className="card-title">Please select a valid city</h5>
                 </div>
               </div>
             )}
+            {!loaded && (
+              <div className={`card mb-3 ${theme}`}>
+                <div className="card-body">
+                  <div className="spinner-grow" role="status" />
+                </div>
+              </div>
+            )}
             <button
               type="button"
-              class="btn btn-secondary"
+              className="btn btn-secondary"
               onClick={switchThemeClick}
             >
               Switch theme
