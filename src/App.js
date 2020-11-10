@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 const API_KEY = "04e0dee5fe194dcd20fb3d326d8e5a4d";
 
 function App() {
+  const [theme, setTheme] = useState("");
   const [validData, setValidData] = useState(false);
   const [placeholderCity, setPlaceholderCity] = useState("");
   const [tempCity, setTempCity] = useState("");
@@ -29,7 +30,23 @@ function App() {
       localStorage.setItem("city", storedCity);
     }
     updateCity(storedCity);
+
+    let storageTheme = localStorage.getItem("theme");
+    if (storageTheme === null || storageTheme === "") {
+      storageTheme = "bg-light text-dark";
+      localStorage.setItem("theme", storageTheme);
+    }
+    setTheme(storageTheme);
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const switchThemeClick = () => {
+    if (theme === "bg-light text-dark") setTheme("bg-dark text-white");
+    else setTheme("bg-light text-dark");
+  };
 
   const isInitialMount = useRef(true);
 
@@ -93,10 +110,10 @@ function App() {
   };
 
   return (
-    <div className="App">
+    <div className={`App ${theme}`}>
       <div className="container-fluid">
         <div className="row">
-          <div className="col-sm w-auto p-5 bg-light text-dark">
+          <div className="col-sm w-auto p-5">
             <div className="input-group mb-3">
               <input
                 type="text"
@@ -119,10 +136,11 @@ function App() {
             </div>
           </div>
         </div>
+
         <div className="row">
           <div className="col">
             {validData && (
-              <div className="card mb-3">
+              <div className={`card mb-3 ${theme}`}>
                 <img
                   src={weather.icon}
                   className="card-img-top mx-auto"
@@ -142,8 +160,8 @@ function App() {
                   </p>
                   <div className="card-text">
                     <small className="text-muted">
-                      <div className="card">
-                        <div className="card-body">
+                      <div className={`card ${theme}`}>
+                        <div className={`card-body ${theme}`}>
                           Minimum temperature:{" "}
                           {Math.round(weather.temp_min - 273.15)}°C
                           <br />
@@ -168,6 +186,13 @@ function App() {
                 </div>
               </div>
             )}
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onClick={switchThemeClick}
+            >
+              Switch theme
+            </button>
           </div>
         </div>
       </div>
