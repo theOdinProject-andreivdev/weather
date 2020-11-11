@@ -1,28 +1,21 @@
 import "./App.css";
 import { useEffect, useRef, useState } from "react";
+import StandardWeather from "./components/StandardWeather";
+
+import TempGraph from "./components/TempGraph";
 
 const API_KEY = "04e0dee5fe194dcd20fb3d326d8e5a4d";
 
 function App() {
   const [theme, setTheme] = useState("");
-  const [validData, setValidData] = useState(true);
+  const [validStandardData, setValidStandardData] = useState(false);
+  const [validDetailedData, setValidDetailedData] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [placeholderCity, setPlaceholderCity] = useState("");
   const [tempCity, setTempCity] = useState("");
   const [city, setCity] = useState("");
-  const [weather, setWeather] = useState({
-    city: "",
-    country: "",
-    main: "",
-    description: "",
-    temp: 0,
-    feels_like: 0,
-    temp_min: 0,
-    temp_max: 0,
-    pressure: 0,
-    humidity: 0,
-    icon: "",
-  });
+  const [standardWeather, setStandardWeather] = useState();
+  const [detailedWeather, setDetailedWeather] = useState();
 
   useEffect(() => {
     let storedCity = localStorage.getItem("city");
@@ -49,33 +42,9 @@ function App() {
     else setTheme("bg-light text-dark");
   };
 
-  const isInitialMount = useRef(true);
-
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-    } else {
-      fetch(
-        "https://api.openweathermap.org/data/2.5/weather?q=" +
-          city +
-          "&appid=" +
-          API_KEY
-      )
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (response) {
-          setValidData(true);
-          setLoaded(true);
-          parseAndSetWeather(response);
-        })
-        .catch((error) => {
-          setValidData(false);
-          setLoaded(false);
-          console.error("Error:", error);
-        });
-    }
-  }, [city]);
+  const isInitialMountCity = useRef(true);
+  const isInitialMountStandardWeather = useRef(true);
+  const isInitialMountDetailedWeather = useRef(true);
 
   const handleTempCityChange = (event) => {
     setTempCity(event.target.value);
@@ -93,24 +62,68 @@ function App() {
     setCity(tempCity);
   };
 
-  const parseAndSetWeather = (response) => {
-    setWeather({
-      city: response.name,
-      country: response.sys.country,
-      main: response.weather[0].main,
-      description: response.weather[0].description,
-      temp: response.main.temp,
-      feels_like: response.main.feels_like,
-      temp_min: response.main.temp_min,
-      temp_max: response.main.temp_max,
-      pressure: response.main.pressure,
-      humidity: response.main.humidity,
-      icon:
-        "http://openweathermap.org/img/wn/" +
-        response.weather[0].icon +
-        "@2x.png",
-    });
-  };
+  useEffect(() => {
+    if (isInitialMountCity.current) {
+      isInitialMountCity.current = false;
+    } else {
+      fetch(
+        "https://api.openweathermap.org/data/2.5/weather?q=" +
+          city +
+          "&appid=" +
+          API_KEY
+      )
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (response) {
+          setStandardWeather(response);
+        })
+        .catch((error) => {
+          setValidStandardData(false);
+          setLoaded(false);
+          console.error("Error:", error);
+        });
+    }
+  }, [city]);
+
+  useEffect(() => {
+    if (isInitialMountStandardWeather.current) {
+      isInitialMountStandardWeather.current = false;
+    } else {
+      setValidStandardData(true);
+      setLoaded(true);
+      fetch(
+        "https://api.openweathermap.org/data/2.5/onecall?lat=" +
+          standardWeather.coord.lat +
+          "&lon=" +
+          standardWeather.coord.lon +
+          "&exclude={part}&appid=" +
+          API_KEY
+      )
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (response) {
+          setDetailedWeather(response);
+          setLoaded(true);
+        })
+        .catch((error) => {
+          setValidDetailedData(false);
+          setLoaded(false);
+          console.error("Error:", error);
+        });
+    }
+  }, [standardWeather]);
+
+  useEffect(() => {
+    if (isInitialMountDetailedWeather.current) {
+      isInitialMountDetailedWeather.current = false;
+    } else {
+      setValidDetailedData(true);
+      console.log(detailedWeather);
+      setLoaded(true);
+    }
+  }, [detailedWeather]);
 
   return (
     <div className={`App ${theme}`}>
@@ -142,47 +155,22 @@ function App() {
 
         <div className="row">
           <div className="col">
-            {validData && loaded && (
-              <div className={`card mb-3 ${theme}`}>
-                <img
-                  src={weather.icon}
-                  className="card-img-top mx-auto"
-                  alt="..."
-                  style={{ width: "100px" }}
-                />
-                <div className="card-body">
-                  <h5 className="card-title">
-                    Weather in {weather.city}, {weather.country}
-                  </h5>
-                  <p className="card-text">
-                    Currently it feels like{" "}
-                    {Math.round(weather.feels_like - 273.15)}°C in{" "}
-                    {weather.city}
-                    <br />
-                    {weather.main} - {weather.description}
-                  </p>
-                  <div className="card-text">
-                    <small className="text-muted">
-                      <div className={`card ${theme}`}>
-                        <div className={`card-body ${theme}`}>
-                          Minimum temperature:{" "}
-                          {Math.round(weather.temp_min - 273.15)}°C
-                          <br />
-                          Maximum temperature:{" "}
-                          {Math.round(weather.temp_max - 273.15)}°C
-                          <br />
-                          Pressure: {weather.pressure}hPa
-                          <br />
-                          Humidity: {weather.humidity}%
-                          <br />
-                        </div>
-                      </div>
-                    </small>
-                  </div>
-                </div>
+            {validStandardData && loaded && (
+              <StandardWeather
+                theme={theme}
+                standardWeather={standardWeather}
+              ></StandardWeather>
+            )}
+            {validDetailedData && (
+              <div>
+                Hourly temperature forecast
+                <TempGraph
+                  detailedWeather={detailedWeather}
+                  theme={theme}
+                ></TempGraph>
               </div>
             )}
-            {!validData && (
+            {!validStandardData && (
               <div className={`card mb-3 ${theme}`}>
                 <div className="card-body">
                   <h5 className="card-title">Please select a valid city</h5>
@@ -200,6 +188,7 @@ function App() {
               type="button"
               className="btn btn-secondary"
               onClick={switchThemeClick}
+              style={{ marginBottom: "30px" }}
             >
               Switch theme
             </button>
