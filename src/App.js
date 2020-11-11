@@ -127,7 +127,7 @@ function App() {
 
   return (
     <div className={`App ${theme}`}>
-      <div className="container-fluid">
+      <div className={`container-fluid ${theme}`}>
         <div className="row">
           <div className="col-sm w-auto p-5">
             <div className="input-group mb-3">
