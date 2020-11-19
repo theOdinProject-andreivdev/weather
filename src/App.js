@@ -4,7 +4,7 @@ import StandardWeather from "./components/StandardWeather";
 
 import TempGraph from "./components/TempGraph";
 
-const API_KEY = "04e0dee5fe194dcd20fb3d326d8e5a4d";
+const API_KEY = "efd3c78cb17d51e687e7a1314415949f";
 
 function App() {
   const [theme, setTheme] = useState("");
@@ -163,7 +163,6 @@ function App() {
             )}
             {validDetailedData && (
               <div>
-                Hourly temperature forecast
                 <TempGraph
                   detailedWeather={detailedWeather}
                   theme={theme}

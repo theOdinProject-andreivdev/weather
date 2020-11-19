@@ -31,6 +31,7 @@ function TempGraph(props) {
             <div className={`card ${props.theme}`}>
               <div className={`card-body ${props.theme}`}>
                 <div style={{ width: "100%", height: "30vh" }}>
+                  Hourly temperature forecast
                   <ResponsiveContainer>
                     <AreaChart
                       data={data}
