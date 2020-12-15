@@ -1,45 +1,45 @@
-import "./App.css";
-import { useEffect, useRef, useState } from "react";
-import StandardWeather from "./components/StandardWeather";
+import './App.css';
+import { useEffect, useRef, useState } from 'react';
+import StandardWeather from './components/StandardWeather';
 
-import TempGraph from "./components/TempGraph";
+import TempGraph from './components/TempGraph';
 
-const API_KEY = "efd3c78cb17d51e687e7a1314415949f";
+const API_KEY = process.env.OPENWEATHERMAP_API_KEY;
 
 function App() {
-  const [theme, setTheme] = useState("");
+  const [theme, setTheme] = useState('');
   const [validStandardData, setValidStandardData] = useState(false);
   const [validDetailedData, setValidDetailedData] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  const [placeholderCity, setPlaceholderCity] = useState("");
-  const [tempCity, setTempCity] = useState("");
-  const [city, setCity] = useState("");
+  const [placeholderCity, setPlaceholderCity] = useState('');
+  const [tempCity, setTempCity] = useState('');
+  const [city, setCity] = useState('');
   const [standardWeather, setStandardWeather] = useState();
   const [detailedWeather, setDetailedWeather] = useState();
 
   useEffect(() => {
-    let storedCity = localStorage.getItem("city");
-    if (storedCity === null || storedCity === "") {
-      storedCity = "London";
-      localStorage.setItem("city", storedCity);
+    let storedCity = localStorage.getItem('city');
+    if (storedCity === null || storedCity === '') {
+      storedCity = 'London';
+      localStorage.setItem('city', storedCity);
     }
     updateCity(storedCity);
 
-    let storageTheme = localStorage.getItem("theme");
-    if (storageTheme === null || storageTheme === "") {
-      storageTheme = "bg-light text-dark";
-      localStorage.setItem("theme", storageTheme);
+    let storageTheme = localStorage.getItem('theme');
+    if (storageTheme === null || storageTheme === '') {
+      storageTheme = 'bg-light text-dark';
+      localStorage.setItem('theme', storageTheme);
     }
     setTheme(storageTheme);
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("theme", theme);
+    localStorage.setItem('theme', theme);
   }, [theme]);
 
   const switchThemeClick = () => {
-    if (theme === "bg-light text-dark") setTheme("bg-dark text-white");
-    else setTheme("bg-light text-dark");
+    if (theme === 'bg-light text-dark') setTheme('bg-dark text-white');
+    else setTheme('bg-light text-dark');
   };
 
   const isInitialMountCity = useRef(true);
@@ -51,13 +51,13 @@ function App() {
   };
 
   const updateCity = (city) => {
-    localStorage.setItem("city", city);
+    localStorage.setItem('city', city);
     setPlaceholderCity(city);
     setCity(city);
   };
 
   const updateCityWithTemp = () => {
-    localStorage.setItem("city", tempCity);
+    localStorage.setItem('city', tempCity);
     setPlaceholderCity(tempCity);
     setCity(tempCity);
   };
@@ -67,9 +67,9 @@ function App() {
       isInitialMountCity.current = false;
     } else {
       fetch(
-        "https://api.openweathermap.org/data/2.5/weather?q=" +
+        'https://api.openweathermap.org/data/2.5/weather?q=' +
           city +
-          "&appid=" +
+          '&appid=' +
           API_KEY
       )
         .then(function (response) {
@@ -81,7 +81,7 @@ function App() {
         .catch((error) => {
           setValidStandardData(false);
           setLoaded(false);
-          console.error("Error:", error);
+          console.error('Error:', error);
         });
     }
   }, [city]);
@@ -93,11 +93,11 @@ function App() {
       setValidStandardData(true);
       setLoaded(true);
       fetch(
-        "https://api.openweathermap.org/data/2.5/onecall?lat=" +
+        'https://api.openweathermap.org/data/2.5/onecall?lat=' +
           standardWeather.coord.lat +
-          "&lon=" +
+          '&lon=' +
           standardWeather.coord.lon +
-          "&exclude={part}&appid=" +
+          '&exclude={part}&appid=' +
           API_KEY
       )
         .then(function (response) {
@@ -110,7 +110,7 @@ function App() {
         .catch((error) => {
           setValidDetailedData(false);
           setLoaded(false);
-          console.error("Error:", error);
+          console.error('Error:', error);
         });
     }
   }, [standardWeather]);
@@ -187,7 +187,7 @@ function App() {
               type="button"
               className="btn btn-secondary"
               onClick={switchThemeClick}
-              style={{ marginBottom: "30px" }}
+              style={{ marginBottom: '30px' }}
             >
               Switch theme
             </button>
