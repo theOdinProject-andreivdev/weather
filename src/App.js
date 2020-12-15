@@ -4,7 +4,9 @@ import StandardWeather from './components/StandardWeather';
 
 import TempGraph from './components/TempGraph';
 
-const API_KEY = process.env.OPENWEATHERMAP_API_KEY;
+const API_KEY = process.env.REACT_APP_API_KEY;
+
+console.log(API_KEY);
 
 function App() {
   const [theme, setTheme] = useState('');
